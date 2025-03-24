@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculator</title>
+    <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+    <div class="wrapper">
+        <h1>Simple Calculator</h1>
+
+        <div class="input-group">
+            <label for="num1">Enter first number:</label>
+            <input type="number" id="num1" />
+        </div>
+
+        <h3 id="operator">+</h3>
+
+        <div class="input-group">
+            <label for="num2">Enter second number:</label>
+            <input type="number" id="num2" />
+        </div>
+
+        <h3 id="result">Result: </h3>
+
+        <div class="button-group">
+            <button onclick="calculate('add')">Addition</button>
+            <button onclick="calculate('subtract')">Subtraction</button>
+            <button onclick="calculate('multiply')">Multiplication</button>
+            <button onclick="calculate('divide')">Division</button>
+            <button onclick="resetFields()">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        async function calculate(operation) {
+            const num1 = document.getElementById("num1").value;
+            const num2 = document.getElementById("num2").value;
+            const operatorDisplay = document.getElementById("operator");
+            const resultDisplay = document.getElementById("result");
+
+            // Validate input
+            if (num1 === "" || num2 === "") {
+                alert("Please enter both numbers.");
+                return;
+            }
+
+            let operatorSymbol = { add: "+", subtract: "-", multiply: "×", divide: "÷" }[operation] || "?";
+            operatorDisplay.innerText = operatorSymbol;
+
+            try {
+                const response = await fetch(`http://localhost:8080/api/calculate?num1=${num1}&num2=${num2}&operation=${operation}`);
+                if (!response.ok) throw new Error("Error connecting to backend");
+
+                const result = await response.text();
+                resultDisplay.innerText = `Result: ${result}`;
+            } catch (error) {
+                console.error("Error:", error);
+                resultDisplay.innerText = "Error calculating.";
+            }
+        }
+
+        function resetFields() {
+            document.getElementById("num1").value = "";
+            document.getElementById("num2").value = "";
+            document.getElementById("operator").innerText = "+";
+            document.getElementById("result").innerText = "Result: ";
+        }
+    </script>
+</body>
+</html>
